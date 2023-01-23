@@ -19,6 +19,8 @@ Now let's extract text from fields of interest and organize them as columns in a
 T = table;
 T.Subreddit = arrayfun(@(x) string(x.data.subreddit),s);
 T.Flair = arrayfun(@(x) x.data.link_flair_text, s, UniformOutput=false);
+T.Flair(cellfun(@isempty,T.Flair)) = {''};
+T.Flair = string(T.Flair);
 T.Title = arrayfun(@(x) string(x.data.title), s);
 T.Body = arrayfun(@(x) string(x.data.selftext), s);
 T.Author = arrayfun(@(x) string(x.data.author), s);
@@ -29,8 +31,7 @@ T = table2timetable(T,"RowTimes","Created_UTC");
 ```
 ## Remove pinned posts
 ```
-isPinned = contains(T.Title, {'Submitting Homework questions? Read this', ...
-    'Suggesting Ideas for Improving the Sub'});
+isPinned = year(T.Created_UTC) < 2023;
 T(isPinned,:) = [];
 ```
 ## Get daily summary
@@ -43,6 +44,8 @@ bar(dailyCount.day_Created_UTC,dailyCount.GroupCount)
 ylabel('Number of posts') 
 title('Daily posts') 
 ```
+![Daily Posts](https://github.com/toshiakit/text_analysis_of_matlab_subreddit/blob/main/daily.png)
+
 ## Preprocess the text data
 Use lower case
 ```
@@ -98,5 +101,6 @@ bag = bagOfNgrams(docs,"NgramLengths",2);
 figure
 wordcloud(bag);
 ```
+![Word Cloud](https://github.com/toshiakit/text_analysis_of_matlab_subreddit/blob/main/wordcloud.png)
 
 _Copyright 2023 The MathWorks, Inc._
